@@ -6,7 +6,7 @@
 /*   By: eli <marvin@42.fr>                         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/21 17:03:58 by eli               #+#    #+#             */
-/*   Updated: 2022/12/23 15:37:18 by eli              ###   ########.fr       */
+/*   Updated: 2022/12/24 00:30:48 by eli              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -106,7 +106,7 @@ class Parser {
 			_parseCoefficients(const std::list<std::string>& list) {
 				for (std::list<std::string>::const_iterator it = list.begin();
 				it != list.end();
-				it++) {
+				++it) {
 					const double value = _extractCoef(*it);
 					const int order = _extractOrder(*it);
 					switch (order) {
@@ -172,7 +172,7 @@ class Parser {
 					return;
 				for (std::map<int, double>::const_iterator it = _orderY.begin();
 					it != _orderY.end();
-					it++) {
+					++it) {
 					if (has_precedent) {
 						cout << (it->second > 0 ? " + " : " - ");
 					} else {
