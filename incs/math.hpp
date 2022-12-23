@@ -6,7 +6,7 @@
 /*   By: eli <marvin@42.fr>                         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/23 15:29:23 by eli               #+#    #+#             */
-/*   Updated: 2022/12/24 00:41:41 by eli              ###   ########.fr       */
+/*   Updated: 2022/12/24 00:43:16 by eli              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,9 +36,11 @@ namespace math {
 		|| std::is_integral<T>::value>::type>
 		T factorial(const T& n);
 
-	template <typename T,
-		typename = typename std::enable_if<std::is_floating_point<T>::value
-		|| std::is_integral<T>::value>::type>
+	template <typename T, typename U,
+		typename = typename std::enable_if<
+			std::is_integral<T>::value
+			&& (std::is_floating_point<U>::value
+			|| std::is_integral<U>::value)>::type>
 		T pow(const T& n, const T& exp);
 
 	template <typename T, typename = typename std::enable_if<std::is_integral<T>::value>::type>
