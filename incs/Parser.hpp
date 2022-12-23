@@ -6,14 +6,21 @@
 /*   By: eli <marvin@42.fr>                         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/21 17:03:58 by eli               #+#    #+#             */
-/*   Updated: 2022/12/23 12:46:50 by eli              ###   ########.fr       */
+/*   Updated: 2022/12/23 15:37:18 by eli              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef PARSER_HPP
 # define PARSER_HPP
 
+# include <string>
+# include <map>
+
 # include "utils.hpp"
+# include "math.hpp"
+
+# define NUMBER_STR "0123456789"
+# define POLYNOMIAL_STR "0123456789X"
 
 class Parser {
 	public:
@@ -33,8 +40,8 @@ class Parser {
 
 				if (pos_equal == std::string::npos)
 					throw std::string("Not a polynomial");
-				_parseCoefficients(utils::parseTerms(_raw.substr(0, pos_equal)));
-				_parseCoefficients(utils::parseTerms(_raw.substr(pos_equal + 2)));
+				_parseCoefficients(_parseTerms(_raw.substr(0, pos_equal)));
+				_parseCoefficients(_parseTerms(_raw.substr(pos_equal + 2)));
 
 				LOG(_order0);
 				LOG(_order1);
@@ -45,10 +52,13 @@ class Parser {
 	/* -- PRESENTATION ------------------------------------------- */
 		void
 			display() const {
-				if (!(_order0 || _order1 || _order2))
-					std::cout << "Nothing to display\n";
-				else
+				if (is_trivial()) {
+					std::cout << "0 = 0\n";
+				//} else if (is_empty()) {
+				//	std::cout << "Nothing to display\n";
+				} else {
 					_displayReducedEquation();
+				}
 			}
 
 	/* -- GETTERS ------------------------------------------------ */
@@ -67,6 +77,20 @@ class Parser {
 				return _order2;
 			}
 
+		bool
+			is_empty() const {
+				if (!(_order0 || _order1 || _order2) && _orderY.empty())
+					return true;
+				return false;
+			}
+
+		bool
+			is_trivial() const {
+				if (!_raw.empty() && is_empty())
+					return true;
+				return false;
+			}
+
 	private:
 	/* -- PROPERTIES ---------------------------------------------- */
 		const std::string					_raw;
@@ -76,13 +100,15 @@ class Parser {
 		std::map<int, double>				_orderY;
 
 	/* -- MAIN PARSE FUNCTION ------------------------------------- */
+
+		/* Parse the coefficients factorised values from each side of the equation */
 		void
 			_parseCoefficients(const std::list<std::string>& list) {
 				for (std::list<std::string>::const_iterator it = list.begin();
 				it != list.end();
 				it++) {
-					const double value = utils::extractCoef(*it);
-					const int order = utils::extractOrder(*it);
+					const double value = _extractCoef(*it);
+					const int order = _extractOrder(*it);
 					switch (order) {
 						case 0:
 							_order0 += value;
@@ -94,14 +120,14 @@ class Parser {
 							_order2 += value;
 							break;
 						default:
-							// create order y if not exist
-							// else push to it
-							utils::newOrder(_orderY, order, value);
+							_newOrder(_orderY, order, value);
 					}
 				}
 			}
 
 	/* -- PRESENTATION ------------------------------------------- */
+
+		/* Display reduced form of the equation */
 		void
 			_displayReducedEquation() const {
 				const bool	is_positive0 = _order0 > 0;
@@ -112,7 +138,7 @@ class Parser {
 
 				if (_order0) {
 					cout << (is_positive0 ? "" : "- ")
-						 << utils::abs(_order0) << " * X ^ 0";
+						 << math::abs(_order0) << " * X ^ 0";
 					has_precedent = true;
 				}
 				if (_order1) {
@@ -122,7 +148,7 @@ class Parser {
 						has_precedent = true;
 						cout << (is_positive1 ? "" : "- ");
 					}
-					cout << utils::abs(_order1) << " * X ^ 1";
+					cout << math::abs(_order1) << " * X ^ 1";
 				}
 				if (_order2) {
 					if (has_precedent) {
@@ -131,13 +157,13 @@ class Parser {
 						has_precedent = true;
 						cout << (is_positive2 ? "" : "- ");
 					}
-					cout << utils::abs(_order2) << " * X ^ 2";
+					cout << math::abs(_order2) << " * X ^ 2";
 				}
-				// Push for excess
 				_displayGarbage(has_precedent);
 				cout << " = 0" << NL;
 			}
 
+		/* Display the excess order terms */
 		void
 			_displayGarbage(bool& has_precedent) const {
 				using std::cout;
@@ -150,11 +176,76 @@ class Parser {
 					if (has_precedent) {
 						cout << (it->second > 0 ? " + " : " - ");
 					} else {
+						has_precedent = true;
 						cout << (it->second > 0 ? "" : "- ");
 					}
-					cout << utils::abs(it->second) << " * X ^ " << it->first;
+					cout << math::abs(it->second) << " * X ^ " << it->first;
 				}
 			}
+
+	/* -- PARSE UTILS --------------------------------------------- */
+		const std::list<std::string>
+			_parseTerms(std::string copy) {
+				std::list<std::string>	terms;
+	
+				while (!copy.empty())
+					terms.push_back(_getNextTerm(copy));
+				return terms;
+			}
+	
+		std::string
+			_getNextTerm(std::string& copy) {
+				const size_t		sum_pos = copy.find_first_of("+-", 1);
+				const std::string	term = _cutOut(copy.substr(0, sum_pos));
+	
+				if (sum_pos == std::string::npos)
+					copy.clear();
+				else
+					copy = copy.substr(sum_pos);
+				return term;
+			}
+	
+		std::string
+			_cutOut(const std::string& chunk) {
+				const size_t	last_ws = chunk.find_last_of(POLYNOMIAL_STR);
+	
+				return chunk.substr(0, last_ws + 1);
+			}
+	
+		double
+			_extractCoef(const std::string& chunk) {
+				const size_t	first_nb = chunk.find_first_of(NUMBER_STR);
+				int				sign;
+	
+				if (first_nb == 2)
+					sign = chunk[0] == '-' ? -1 : 1;
+				else if (!first_nb)
+					sign = 1;
+				else
+					throw std::string("Not a correct value");
+				return sign * std::stod(chunk.substr(first_nb, chunk.find(' ', first_nb)));
+			}
+	
+		int
+			_extractOrder(const std::string& chunk) {
+				const size_t	var_pos = chunk.find("X ^ ");
+	
+				if (var_pos == std::string::npos)
+					return 0;
+				return std::stoi(chunk.substr(var_pos + 4));
+			}
+	
+		void
+			_newOrder(std::map<int, double>& m, const int order, const double value) {
+				std::map<int, double>::iterator	it = m.find(order);
+	
+				if (it != m.end()) {
+					it->second += value;
+				} else {
+					m.insert(std::pair<int, double>(order, value));
+				}
+			}
+
 };
 
 #endif
