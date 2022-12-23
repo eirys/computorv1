@@ -3,11 +3,15 @@
 NAME	= computor
 
 CC		= c++
-CFLAGS	= -Wall -Werror -Wextra -g
+CFLAGS	= -Wall -Werror -Wextra -g -std=c++11
 INC		= -I./incs
 
 SRC		= main.cpp
 OBJ		= $(SRC:.cpp=.o)
+
+ifdef debug
+	CFLAGS += -DDEBUG=1
+endif
 
 # ================= RULES ========================
 

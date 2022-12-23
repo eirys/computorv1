@@ -1,3 +1,5 @@
+
+#include <iostream>
 #include "Parser.hpp"
 
 int main(int ac, const char** av) {
@@ -6,7 +8,7 @@ int main(int ac, const char** av) {
 	try {
 		Parser	parser(av[1]);
 		parser.parse();
-	} catch (const char* e) {
+	} catch (const std::string& e) {
 		std::cerr << e << std::endl;
 		return 1;
 	}

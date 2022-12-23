@@ -6,116 +6,127 @@
 /*   By: eli <marvin@42.fr>                         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/21 17:03:58 by eli               #+#    #+#             */
-/*   Updated: 2022/12/22 00:22:29 by eli              ###   ########.fr       */
+/*   Updated: 2022/12/23 02:17:28 by eli              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
-
-#include <iostream>
 
 #ifndef PARSER_HPP
 # define PARSER_HPP
 
-# include <string>
-# include <list>
-
-# define NUMBER_STR "0123456789"
-# define POLYNOMIAL_STR "0123456789X"
+# include "utils.hpp"
 
 class Parser {
 	public:
-
-	/* -- CONSTRUCTOR - DESTRUCTOR -------------------------------------------------------------- */
+	/* -- CONSTRUCTOR - DESTRUCTOR -------------------------------- */
 		Parser(const char* input):
-			_raw(input) {}
+			_raw(input),
+			_order0(0),
+			_order1(0),
+			_order2(0) {}
 
 		~Parser() {}
 
-	/* -- PARSING ------------------------------------------------------------------------------- */
+	/* -- PARSING ------------------------------------------------- */
 		void 
 			parse() {
-				const size_t pos_equal = _raw.find('=');
+				const size_t	pos_equal = _raw.find('=');
 
 				if (pos_equal == std::string::npos)
-					throw "Not a polynomial";
-				const std::list<std::string> l1 = _parseBeforeEqual(_raw.substr(0, pos_equal));
-				const std::list<std::string> l2 = _parseAfterEqual(_raw.substr(pos_equal + 1));
+					throw std::string("Not a polynomial");
+				_parseCoefficients(utils::parseTerms(_raw.substr(0, pos_equal)));
+				_parseCoefficients(utils::parseTerms(_raw.substr(pos_equal + 2)));
 
-				_display(l1);
-				_display(l2);
+				LOG(_order0);
+				LOG(_order1);
+				LOG(_order2);
+				display();
 			}
 
-	/* -- GETTERS ------------------------------------------------------------------------------- */
-		const std::list<float>&
-			getOrder2() const {
-				return _order2;
+	/* -- PRESENTATION ------------------------------------------- */
+		void
+			display() const {
+				if (!(_order0 || _order1 || _order2))
+					std::cout << "Nothing to display\n";
+				else
+					_displayReducedEquation();
 			}
 
-		const std::list<float>&
+	/* -- GETTERS ------------------------------------------------ */
+		double
+			getOrder0() const {
+				return _order0;
+			}
+		
+		double
 			getOrder1() const {
 				return _order1;
 			}
 
-		const std::list<float>&
-			getOrder0() const {
-				return _order0;
+		double
+			getOrder2() const {
+				return _order2;
 			}
-
 
 	private:
-	/* -- PROPERTIES ---------------------------------------------------------------------------- */
+	/* -- PROPERTIES ---------------------------------------------- */
 		const std::string					_raw;
-		std::list<float>					_order2;
-		std::list<float>					_order1;
-		std::list<float>					_order0;
+		double								_order0;
+		double								_order1;
+		double								_order2;
 
-	/* -- PARSE UTILS --------------------------------------------------------------------------- */
-		const std::list<std::string>
-			_parseBeforeEqual(std::string copy) {
-				std::list<std::string> terms;
-
-				while (!copy.empty()) {
-					terms.push_back(_getNextTerm(copy));
-				}
-				return terms;
-			}
-
-		const std::list<std::string>
-			_parseAfterEqual(std::string copy) {
-				std::list<std::string> terms;
-
-				while (!copy.empty()) {
-					terms.push_back(_getNextTerm(copy));
-				}
-				return terms;
-			}
-
-		std::string
-			_getNextTerm(std::string& copy) const {
-				const size_t sum_pos = copy.find("+-", 1);
-				std::string term = _cutOut(copy.substr(0, sum_pos));
-
-				if (sum_pos == std::string::npos)
-					copy.clear();
-				else
-					copy = copy.substr(sum_pos);
-				return term;
-			}
-
-		std::string
-			_cutOut(const std::string& chunk) const {
-				const size_t last_ws = chunk.find_last_of(POLYNOMIAL_STR);
-
-				return chunk.substr(0, last_ws + 1);
-			}
-
-	/* -- MISCELLANEOUS ------------------------------------------------------------------------- */
+	/* -- MAIN PARSE FUNCTION ------------------------------------- */
 		void
-			_display(const std::list<std::string>& l) const {
-				for (std::list<std::string>::const_iterator it = l.begin();
-						it != l.end();
-						it++) {
-					std::cout << *it << " - " << std::endl;
+			_parseCoefficients(const std::list<std::string>& list) {
+				for (std::list<std::string>::const_iterator it = list.begin();
+				it != list.end();
+				it++) {
+					const double value = utils::extractCoef(*it);
+					switch (utils::extractOrder(*it)) {
+						case 1:
+							_order1 += value;
+							break;
+						case 2:
+							_order2 += value;
+							break;
+						default:
+							_order0 += value;
+							break;
+					}
 				}
+			}
+
+	/* -- PRESENTATION ------------------------------------------- */
+		void
+			_displayReducedEquation() const {
+				const bool	is_positive0 = _order0 > 0;
+				const bool	is_positive1 = _order1 > 0;
+				const bool	is_positive2 = _order2 > 0;
+				bool		has_precedent = false;
+				using std::cout;
+
+				if (_order0) {
+					cout << (is_positive0 ? "" : "- ")
+						 << utils::abs(_order0) << " * X ^ 0";
+					has_precedent = true;
+				}
+				if (_order1) {
+					if (has_precedent) {
+						cout << (is_positive1 ? " + " : " - ");
+					} else {
+						has_precedent = true;
+						cout << (is_positive1 ? "" : "- ");
+					}
+					cout << utils::abs(_order1) << " * X ^ 1";
+				}
+				if (_order2) {
+					if (has_precedent) {
+						cout << (is_positive2 ? " + " : " - ");
+					} else {
+						cout << (is_positive2 ? "" : "- ");
+					}
+					cout << utils::abs(_order2) << " * X ^ 2";
+				}
+				cout << " = 0" << NL;
 			}
 };
 
