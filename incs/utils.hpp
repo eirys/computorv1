@@ -6,7 +6,7 @@
 /*   By: eli <marvin@42.fr>                         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/22 18:26:40 by eli               #+#    #+#             */
-/*   Updated: 2022/12/23 02:18:58 by eli              ###   ########.fr       */
+/*   Updated: 2022/12/23 12:44:32 by eli              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,8 +14,9 @@
 # define UTILS_HPP
 
 # include <string>
-# include <list>
 # include <type_traits>
+# include <list>
+# include <map>
 
 # define NUMBER_STR "0123456789"
 # define POLYNOMIAL_STR "0123456789X"
@@ -43,6 +44,14 @@ namespace utils {
 
 	int
 		extractOrder(const std::string& chunk);
+
+	template <typename T, typename = typename std::enable_if<std::is_floating_point<T>::value
+		|| std::is_integral<T>::value>::type>
+	T
+		abs(const T& x);
+
+	void
+		newOrder(std::map<int, double>& m, const int order, const double value);
 
 	template <typename T>
 	void
@@ -100,9 +109,21 @@ namespace utils {
 			return std::stoi(chunk.substr(var_pos + 4));
 		}
 
+	inline void
+		newOrder(std::map<int, double>& m, const int order, const double value) {
+			std::map<int, double>::iterator	it = m.find(order);
+
+			if (it != m.end()) {
+				it->second += value;
+			} else {
+				m.insert(std::pair<int, double>(order, value));
+			}
+		}
+
 	/* -- MATH TOOLS ---------------------------------------------- */
 	template <typename T,
-			 typename = std::enable_if<std::is_floating_point<T>::value> >
+		typename = typename std::enable_if<std::is_floating_point<T>::value
+		|| std::is_integral<T>::value>::type>
 	inline T
 		abs(const T& x) {
 			return (x < 0) ? -x : x;

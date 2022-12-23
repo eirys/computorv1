@@ -6,7 +6,7 @@
 /*   By: eli <marvin@42.fr>                         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/21 17:03:58 by eli               #+#    #+#             */
-/*   Updated: 2022/12/23 02:17:28 by eli              ###   ########.fr       */
+/*   Updated: 2022/12/23 12:46:50 by eli              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -73,6 +73,7 @@ class Parser {
 		double								_order0;
 		double								_order1;
 		double								_order2;
+		std::map<int, double>				_orderY;
 
 	/* -- MAIN PARSE FUNCTION ------------------------------------- */
 		void
@@ -81,7 +82,11 @@ class Parser {
 				it != list.end();
 				it++) {
 					const double value = utils::extractCoef(*it);
-					switch (utils::extractOrder(*it)) {
+					const int order = utils::extractOrder(*it);
+					switch (order) {
+						case 0:
+							_order0 += value;
+							break;
 						case 1:
 							_order1 += value;
 							break;
@@ -89,8 +94,9 @@ class Parser {
 							_order2 += value;
 							break;
 						default:
-							_order0 += value;
-							break;
+							// create order y if not exist
+							// else push to it
+							utils::newOrder(_orderY, order, value);
 					}
 				}
 			}
@@ -122,11 +128,32 @@ class Parser {
 					if (has_precedent) {
 						cout << (is_positive2 ? " + " : " - ");
 					} else {
+						has_precedent = true;
 						cout << (is_positive2 ? "" : "- ");
 					}
 					cout << utils::abs(_order2) << " * X ^ 2";
 				}
+				// Push for excess
+				_displayGarbage(has_precedent);
 				cout << " = 0" << NL;
+			}
+
+		void
+			_displayGarbage(bool& has_precedent) const {
+				using std::cout;
+
+				if (_orderY.empty())
+					return;
+				for (std::map<int, double>::const_iterator it = _orderY.begin();
+					it != _orderY.end();
+					it++) {
+					if (has_precedent) {
+						cout << (it->second > 0 ? " + " : " - ");
+					} else {
+						cout << (it->second > 0 ? "" : "- ");
+					}
+					cout << utils::abs(it->second) << " * X ^ " << it->first;
+				}
 			}
 };
 
