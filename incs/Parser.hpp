@@ -6,7 +6,7 @@
 /*   By: eli <marvin@42.fr>                         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/21 17:03:58 by eli               #+#    #+#             */
-/*   Updated: 2022/12/24 00:30:48 by eli              ###   ########.fr       */
+/*   Updated: 2022/12/24 16:54:37 by eli              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,19 +46,7 @@ class Parser {
 				LOG(_order0);
 				LOG(_order1);
 				LOG(_order2);
-				display();
-			}
-
-	/* -- PRESENTATION ------------------------------------------- */
-		void
-			display() const {
-				if (is_trivial()) {
-					std::cout << "0 = 0\n";
-				//} else if (is_empty()) {
-				//	std::cout << "Nothing to display\n";
-				} else {
-					_displayReducedEquation();
-				}
+				_display();
 			}
 
 	/* -- GETTERS ------------------------------------------------ */
@@ -136,6 +124,7 @@ class Parser {
 				bool		has_precedent = false;
 				using std::cout;
 
+				cout << "Reduced form: ";
 				if (_order0) {
 					cout << (is_positive0 ? "" : "- ")
 						 << math::abs(_order0) << " * X ^ 0";
@@ -245,6 +234,19 @@ class Parser {
 					m.insert(std::pair<int, double>(order, value));
 				}
 			}
+
+	/* -- PRESENTATION ------------------------------------------- */
+		void
+			_display() const {
+				if (is_trivial()) {
+					std::cout << "0 = 0\n";
+				//} else if (is_empty()) {
+				//	std::cout << "Nothing to display\n";
+				} else {
+					_displayReducedEquation();
+				}
+			}
+
 
 };
 

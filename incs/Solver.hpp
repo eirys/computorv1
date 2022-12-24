@@ -6,7 +6,7 @@
 /*   By: eli <marvin@42.fr>                         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/23 15:18:37 by eli               #+#    #+#             */
-/*   Updated: 2022/12/24 15:22:00 by eli              ###   ########.fr       */
+/*   Updated: 2022/12/24 16:58:04 by eli              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,11 +27,13 @@ class Solver {
 
 	/* -- SOLVER -------------------------------------------------- */
 		void
-			solve() {
-				const double delta = _compute_discriminant();
-				if (delta > 0) {
-					_delta_positive(delta);
+			solve() const {
+				if (!_a && !_b) {
+					return _noRoots();
+				} else if (!_a && _b && !_c) {
+					return _deltaNull();
 				}
+				return _solvePolynomial();
 			}
 
 	private:
@@ -40,24 +42,53 @@ class Solver {
 		double		_b;
 		double		_c;
 
-	/* ------------------------------------------------------------ */
-
+	/* -- SOLVING TOOLS ------------------------------------------- */
 		double
-			_compute_discriminant() {
+			_computeDiscriminant() const {
 				return (_b * _b) - (4 * _a * _c);
 			}
 
 		void
-			_delta_positive(const double discriminant) const {
-				double	sqrt_delta = math::sqrt(discriminant);
-				double	x1 = (- _b - sqrt_delta) / 2 * _a;
-				double	x2 = (- _b + sqrt_delta) / 2 * _a;
-				using std::cout;
+			_deltaPositive(const double discriminant) const {
+				const double	sqrt_delta = math::sqrt(discriminant);
+				const double	x1 = (- _b - sqrt_delta) / 2 * _a;
+				const double	x2 = (- _b + sqrt_delta) / 2 * _a;
 
-				cout << "There are two roots:" << NL
-					<< "x1 = " << x1 << " & x2 = " << x2 << NL;
+				std::cout << "There are two roots: "
+					<< "x1 = " << (x1 ? x1 : 0) << ", x2 = " << (x2 ? x2 : 0) << NL;
 			}
 
+		void
+			_deltaNull() const {
+				const double	x = - _b / 2 * _a;
+
+				std::cout << "There is one root: "
+					<< "x = " << (x ? x : 0) << NL;
+			}
+
+		void
+			_deltaNegative(const double discriminant) const {
+				//TODO: complex solutions
+				(void)discriminant;
+				return _noRoots();
+			}
+
+		void
+			_noRoots() const {
+				std::cout << "There are no roots." << NL;
+			}
+
+		void
+			_solvePolynomial() const {
+				const double delta = _computeDiscriminant();
+				if (delta > 0) {
+					return _deltaPositive(delta);
+				} else if (delta < 0) {
+					return _deltaNegative(delta);
+				} else {
+					return _deltaNull();
+				}
+			}
 };
 
 #endif
