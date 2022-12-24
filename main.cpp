@@ -10,8 +10,11 @@ int main(int ac, const char** av) {
 		return 1;
 	}
 	try {
-		Parser	parser(av[1]);
-		parser.parse();
+		//Parser	parser(av[1]);
+		//parser.parse();
+		(void)av;
+		std::cout << math::sqrt(9) << NL;
+		std::cout << math::sqrt(10.f) << NL;
 	} catch (const std::string& e) {
 		std::cerr << e << NL;
 		return 1;
