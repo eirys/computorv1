@@ -6,7 +6,7 @@
 /*   By: eli <marvin@42.fr>                         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/21 17:03:58 by eli               #+#    #+#             */
-/*   Updated: 2022/12/24 16:54:37 by eli              ###   ########.fr       */
+/*   Updated: 2022/12/24 21:04:29 by eli              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,6 +22,11 @@
 # define NUMBER_STR "0123456789"
 # define POLYNOMIAL_STR "0123456789X"
 
+enum eSide {
+	LEFTSIDE = 1,
+	RIGHTSIDE = -1
+};
+
 class Parser {
 	public:
 	/* -- CONSTRUCTOR - DESTRUCTOR -------------------------------- */
@@ -36,12 +41,12 @@ class Parser {
 	/* -- PARSING ------------------------------------------------- */
 		void 
 			parse() {
-				const size_t	pos_equal = _raw.find('=');
+				const size_t	pos_equal = _raw.find(" = ");
 
 				if (pos_equal == std::string::npos)
-					throw std::string("Not a polynomial");
-				_parseCoefficients(_parseTerms(_raw.substr(0, pos_equal)));
-				_parseCoefficients(_parseTerms(_raw.substr(pos_equal + 2)));
+					throw std::string("Not correct format");
+				_parseCoefficients(_parseTerms(_raw.substr(0, pos_equal + 1)), LEFTSIDE);
+				_parseCoefficients(_parseTerms(_raw.substr(pos_equal + 3)), RIGHTSIDE);
 
 				LOG(_order0);
 				LOG(_order1);
@@ -66,15 +71,12 @@ class Parser {
 			}
 
 		bool
-			is_empty() const {
-				if (!(_order0 || _order1 || _order2) && _orderY.empty())
-					return true;
-				return false;
-			}
-
-		bool
 			is_trivial() const {
-				if (!_raw.empty() && is_empty())
+				if (!_raw.empty()
+					&& _orderY.empty()
+					&& !(_order0
+						|| _order1
+						|| _order2))
 					return true;
 				return false;
 			}
@@ -91,11 +93,11 @@ class Parser {
 
 		/* Parse the coefficients factorised values from each side of the equation */
 		void
-			_parseCoefficients(const std::list<std::string>& list) {
+			_parseCoefficients(const std::list<std::string>& list, enum eSide side) {
 				for (std::list<std::string>::const_iterator it = list.begin();
 				it != list.end();
 				++it) {
-					const double value = _extractCoef(*it);
+					const double value = side * _extractCoef(*it);
 					const int order = _extractOrder(*it);
 					switch (order) {
 						case 0:
@@ -113,7 +115,7 @@ class Parser {
 				}
 			}
 
-	/* -- PRESENTATION ------------------------------------------- */
+	/* -- DISPLAY ------------------------------------------------ */
 
 		/* Display reduced form of the equation */
 		void
@@ -122,7 +124,7 @@ class Parser {
 				const bool	is_positive1 = _order1 > 0;
 				const bool	is_positive2 = _order2 > 0;
 				bool		has_precedent = false;
-				using std::cout;
+				using		std::cout;
 
 				cout << "Reduced form: ";
 				if (_order0) {
@@ -155,7 +157,7 @@ class Parser {
 		/* Display the excess order terms */
 		void
 			_displayGarbage(bool& has_precedent) const {
-				using std::cout;
+				using	std::cout;
 
 				if (_orderY.empty())
 					return;
@@ -170,6 +172,21 @@ class Parser {
 					}
 					cout << math::abs(it->second) << " * X ^ " << it->first;
 				}
+			}
+
+		void
+			_displayOrder() const {
+				using	std::cout;
+
+				cout << "Polynomial degree: ";
+				if (!_orderY.empty())
+					cout << _orderY.rbegin()->first << NL;
+				else if (_order2)
+					cout << '2' << NL;
+				else if (_order1)
+					cout << '1' << NL;
+				else
+					cout << '0' << NL;
 			}
 
 	/* -- PARSE UTILS --------------------------------------------- */
@@ -208,10 +225,10 @@ class Parser {
 	
 				if (first_nb == 2)
 					sign = chunk[0] == '-' ? -1 : 1;
-				else if (!first_nb)
+				else if (first_nb == 0)
 					sign = 1;
 				else
-					throw std::string("Not a correct value");
+					throw std::string("Not correct format");
 				return sign * std::stod(chunk.substr(first_nb, chunk.find(' ', first_nb)));
 			}
 	
@@ -228,11 +245,10 @@ class Parser {
 			_newOrder(std::map<int, double>& m, const int order, const double value) {
 				std::map<int, double>::iterator	it = m.find(order);
 	
-				if (it != m.end()) {
+				if (it != m.end())
 					it->second += value;
-				} else {
+				else
 					m.insert(std::pair<int, double>(order, value));
-				}
 			}
 
 	/* -- PRESENTATION ------------------------------------------- */
@@ -240,14 +256,11 @@ class Parser {
 			_display() const {
 				if (is_trivial()) {
 					std::cout << "0 = 0\n";
-				//} else if (is_empty()) {
-				//	std::cout << "Nothing to display\n";
 				} else {
 					_displayReducedEquation();
+					_displayOrder();
 				}
 			}
-
-
 };
 
 #endif

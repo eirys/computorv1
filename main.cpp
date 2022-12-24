@@ -11,10 +11,10 @@ int main(int ac, const char** av) {
 		return 1;
 	}
 	try {
-		Parser	parser(av[1]);
+		Parser			parser(av[1]);
 		parser.parse();
 
-		Solver	solver(parser);
+		const Solver	solver(parser);
 		solver.solve();
 
 	} catch (const std::string& e) {
