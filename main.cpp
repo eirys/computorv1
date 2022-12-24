@@ -1,6 +1,7 @@
 
 #include <iostream>
 #include "Parser.hpp"
+#include "Solver.hpp"
 
 int main(int ac, const char** av) {
 	if (ac != 2) {
@@ -10,11 +11,12 @@ int main(int ac, const char** av) {
 		return 1;
 	}
 	try {
-		//Parser	parser(av[1]);
-		//parser.parse();
-		(void)av;
-		std::cout << math::sqrt(9) << NL;
-		std::cout << math::sqrt(10.f) << NL;
+		Parser	parser(av[1]);
+		parser.parse();
+
+		Solver	solver(parser);
+		solver.solve();
+
 	} catch (const std::string& e) {
 		std::cerr << e << NL;
 		return 1;

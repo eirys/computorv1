@@ -6,7 +6,7 @@
 /*   By: eli <marvin@42.fr>                         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/23 15:18:37 by eli               #+#    #+#             */
-/*   Updated: 2022/12/23 22:05:25 by eli              ###   ########.fr       */
+/*   Updated: 2022/12/24 15:22:00 by eli              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,8 +25,14 @@ class Solver {
 
 		~Solver() {}
 
-	/* -- PRESENTATION -------------------------------------------- */
-
+	/* -- SOLVER -------------------------------------------------- */
+		void
+			solve() {
+				const double delta = _compute_discriminant();
+				if (delta > 0) {
+					_delta_positive(delta);
+				}
+			}
 
 	private:
 	/* -- PROPERTIES ---------------------------------------------- */
@@ -35,14 +41,23 @@ class Solver {
 		double		_c;
 
 	/* ------------------------------------------------------------ */
+
 		double
-			getDiscriminant() const {
+			_compute_discriminant() {
 				return (_b * _b) - (4 * _a * _c);
 			}
 
 		void
-			delta_positive() const {
+			_delta_positive(const double discriminant) const {
+				double	sqrt_delta = math::sqrt(discriminant);
+				double	x1 = (- _b - sqrt_delta) / 2 * _a;
+				double	x2 = (- _b + sqrt_delta) / 2 * _a;
+				using std::cout;
+
+				cout << "There are two roots:" << NL
+					<< "x1 = " << x1 << " & x2 = " << x2 << NL;
 			}
+
 };
 
 #endif
