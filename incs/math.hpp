@@ -6,20 +6,22 @@
 /*   By: eli <marvin@42.fr>                         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/23 15:29:23 by eli               #+#    #+#             */
-/*   Updated: 2022/12/24 14:55:08 by eli              ###   ########.fr       */
+/*   Updated: 2022/12/25 14:13:48 by eli              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef MATH_HPP
 # define MATH_HPP
 
+# include <cstddef>
+# include <string>
 # include <type_traits>
 
 # define SQRT_DEPTH 20 // Bigger = better precision
 
 namespace math {
 
-	/* -- PROTOTYPES ---------------------------------------------------------------------------- */
+	/* -- PROTOTYPE ----------------------------------------------- */
 
 	template <typename T>
 		T abs(const T& x);
@@ -36,25 +38,23 @@ namespace math {
 	template <typename T>
 		T sqrt(const T& x);
 
-	/* -- DEFINITIONS --------------------------------------------------------------------------- */
+	/* -- DEFINITION ---------------------------------------------- */
 
 	/*
-	**  | x |
-	*/
+	 **  | x |
+	 */
 	template <typename T>
-	inline T
-		abs(const T& x) {
+		inline T abs(const T& x) {
 			return (x < 0) ? -x : x;
 		}
 
 	/*
-	**  / n \          n!
-	** |     |  =  ----------
-	**  \ p /       (n - p)!
-	*/
+	 **  / n \          n!
+	 ** |     |  =  ----------
+	 **  \ p /       (n - p)!
+	 */
 	template <typename T, typename U>
-	inline T
-		binomial_coefficient(const T& n, const U& p) {
+		inline T binomial_coefficient(const T& n, const U& p) {
 			const T denominator = factorial(p);
 			T numerator = 1;
 			for (T i = 0; i < p; ++i)
@@ -63,11 +63,10 @@ namespace math {
 		}
 
 	/*
-	**  n! = n * (n - 1) * ... * 2 * 1
-	*/
+	 **  n! = n * (n - 1) * ... * 2 * 1
+	 */
 	template <typename T>
-	inline T
-		factorial(const T& n) {
+		inline T factorial(const T& n) {
 			if (n == 1 || n == 0)
 				return 1;
 			return n * factorial(n - 1);
@@ -75,11 +74,10 @@ namespace math {
 
 
 	/*
-	**  n ^ exp
-	*/
+	 **  n ^ exp
+	 */
 	template <typename T, typename U>
-	inline T
-		pow(const T& n, const U& exp) {
+		inline T pow(const T& n, const U& exp) {
 			if (exp == 0 || n == 1)
 				return 1;
 			else if (n == 0)
@@ -89,12 +87,11 @@ namespace math {
 		}
 
 	/*   ___
-	**  √ x    cf. Taylor Series:
-	**            (1 + x) ^ .5
-	*/
+	 **  √ x    cf. Taylor Series:
+	 **            (1 + x) ^ .5
+	 */
 	template <typename T>
-	inline T
-		sqrt(const T& val) {
+		inline T sqrt(const T& val) {
 			const size_t	exponent = std::to_string(static_cast<long long>(val)).size();
 			const double	x = (val / pow(val, exponent)) - 1;
 			T				sum = 0;

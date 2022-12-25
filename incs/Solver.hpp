@@ -6,7 +6,7 @@
 /*   By: eli <marvin@42.fr>                         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/23 15:18:37 by eli               #+#    #+#             */
-/*   Updated: 2022/12/24 16:58:04 by eli              ###   ########.fr       */
+/*   Updated: 2022/12/25 12:09:35 by eli              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -68,9 +68,14 @@ class Solver {
 
 		void
 			_deltaNegative(const double discriminant) const {
-				//TODO: complex solutions
-				(void)discriminant;
-				return _noRoots();
+				const double	sqrt_delta = math::sqrt(-discriminant);
+				const double	b_a = - _b / (2 * _a);
+				const double	delta_a = sqrt_delta / (2 * _a);
+
+				std::cout << "Let i in ℂ be so that i * i = -1." << NL
+					<< "There are two roots: "
+					<< "x1 = " << b_a << " + i" << delta_a
+					<< ", x2 = " << b_a << " - i" << delta_a << NL;
 			}
 
 		void

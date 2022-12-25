@@ -16,7 +16,6 @@ int main(int ac, const char** av) {
 
 		const Solver	solver(parser);
 		solver.solve();
-
 	} catch (const std::string& e) {
 		std::cerr << e << NL;
 		return 1;
