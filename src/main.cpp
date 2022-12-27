@@ -3,6 +3,23 @@
 #include "Parser.hpp"
 #include "Solver.hpp"
 
+int main(int ac, char** av) {
+
+	(void)ac;(void)av;
+
+	double a = 323.0f; int b = 2;
+	std::cout << a << NL
+		<< b << NL
+		<< std::boolalpha
+		<< math::isPrime(a) << NL
+		<< math::isPrime(b) << NL;
+
+	std::cout << math::nearestPrime(a) << NL;
+	std::cout << math::nearestPrime(b) << NL;
+}
+
+/*
+
 int main(int ac, const char** av) {
 	if (ac != 2) {
 		std::cerr << "Argument incorrect. Usage examples:" << NL
@@ -25,3 +42,6 @@ int main(int ac, const char** av) {
 	}
 	return 0;
 }
+
+*/
+

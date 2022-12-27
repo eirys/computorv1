@@ -21,15 +21,14 @@ endif
 .PHONY: all
 all: obj $(NAME)
 
+obj:
+	mkdir obj
+
 $(NAME): $(OBJ)
 	$(CC) $(CFLAGS) $(INC) $(OBJ) -o $(NAME)
 
 obj/%.o: src/%.cpp
 	$(CC) $(CFLAGS) $(INC) -c $< -o $@
-
-.PHONY: obj
-obj:
-	mkdir -p obj
 
 .PHONY: clean
 clean:
