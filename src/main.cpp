@@ -4,18 +4,14 @@
 #include "Solver.hpp"
 
 int main(int ac, char** av) {
+	using std::cout;
+	using namespace math;
 
 	(void)ac;(void)av;
 
-	double a = 323.0f; int b = 2;
-	std::cout << a << NL
-		<< b << NL
-		<< std::boolalpha
-		<< math::isPrime(a) << NL
-		<< math::isPrime(b) << NL;
-
-	std::cout << math::nearestPrime(a) << NL;
-	std::cout << math::nearestPrime(b) << NL;
+	cout << std::boolalpha;
+	for (int a = 0; a < 50; ++a)
+		std::cout << "a = " << a <<" : " << math::biggestPrime(a) << NL;
 }
 
 /*
