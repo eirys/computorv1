@@ -4,7 +4,7 @@ NAME	= computor
 
 CC		= c++
 CFLAGS	= -Wall -Werror -Wextra -g -std=c++11
-INC		= -I./incs
+INC		= -I./incs/parser -I./incs/tools -I./incs/tree -I./incs/types
 
 SRCS	= main.cpp
 OBJS	= $(SRCS:.cpp=.o)
