@@ -6,7 +6,7 @@
 /*   By: eli <eli@student.42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/16 11:26:28 by etran             #+#    #+#             */
-/*   Updated: 2023/03/30 18:09:07 by eli              ###   ########.fr       */
+/*   Updated: 2023/03/30 18:32:34 by eli              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -182,7 +182,9 @@ Indeterminates	Indeterminates::operator/(const Indeterminates& other) const {
 
 Indeterminates	Indeterminates::operator^(const Indeterminates& other) const {
 	// Support only trivial exponentiation
-	if (!other._isUnit())
+	if (other.getMap().empty())
+		return Indeterminates(Indeterminates::unit.toShared());
+	else if (!other._isUnit())
 		throw ExpansionNotSupported();
 
 	const Rational&	other_factor = *other.getMap().begin()->second;
