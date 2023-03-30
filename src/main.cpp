@@ -6,7 +6,7 @@
 /*   By: eli <eli@student.42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/06 21:35:23 by eli               #+#    #+#             */
-/*   Updated: 2023/03/30 18:50:08 by eli              ###   ########.fr       */
+/*   Updated: 2023/03/30 18:51:25 by eli              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,7 +61,7 @@ void	computeEntry(const std::string& entry) {
 
 int main(int ac, char* const* av) {
 	if (ac == 2) {
-		// Input
+		// Input style
 		computeEntry(av[1]);
 		return 0;
 	} else if (ac != 1) {
