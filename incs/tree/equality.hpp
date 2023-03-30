@@ -6,7 +6,7 @@
 /*   By: eli <eli@student.42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/14 12:43:36 by etran             #+#    #+#             */
-/*   Updated: 2023/03/30 15:58:24 by eli              ###   ########.fr       */
+/*   Updated: 2023/03/30 18:48:43 by eli              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,8 +52,13 @@ class Equality: public ATreeNode {
 		}
 
 		Indeterminates		collapse() const {
-			Indeterminates	ind = base::getLeft()->collapse() - base::getRight()->collapse();
-			DEBUG("Equality: " << ind);
+			Indeterminates	lhs = base::getLeft()->collapse();
+			std::cout << "Left hand side:\n" << lhs << NL;
+			Indeterminates	rhs = base::getRight()->collapse();
+			std::cout << "Right hand side:\n" << rhs << NL;
+			DEBUG("Equality: ");
+			Indeterminates	ind = lhs - rhs;
+			std::cout << "Combining members:\n" << ind << " = 0" << NL;
 			#ifdef __DEBUG
 			ind.show();
 			#endif

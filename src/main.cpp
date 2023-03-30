@@ -6,7 +6,7 @@
 /*   By: eli <eli@student.42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/06 21:35:23 by eli               #+#    #+#             */
-/*   Updated: 2023/03/30 18:20:36 by eli              ###   ########.fr       */
+/*   Updated: 2023/03/30 18:50:08 by eli              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,7 +45,6 @@ void	computeEntry(const std::string& entry) {
 
 		DEBUG("Collapsing");
 		ind_res = (*output)->collapse();
-		cout	<< "Expanded expression:\n" << ind_res << " = 0 " << NL;
 
 		Solver	solver(ind_res);
 		solver.solve();
@@ -76,7 +75,7 @@ int main(int ac, char* const* av) {
 	cout <<	"Welcome to computorv1 (v1.0.0, 2023), computorv2's lil brother, "
 			"made with love by @etran.\n"
 			"With this program, you can only solve equations (1st and 2nd degree polynomials of R only)\n"
-			"  (example: `x+1 = 2*x`).\n";
+			"Example input: `x+1 = 2*x`.\n";
 
 	while (!cin.eof()) {
 		cout << PROMPT;
