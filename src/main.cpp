@@ -6,7 +6,7 @@
 /*   By: eli <eli@student.42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/06 21:35:23 by eli               #+#    #+#             */
-/*   Updated: 2023/03/30 17:54:42 by eli              ###   ########.fr       */
+/*   Updated: 2023/03/30 18:20:36 by eli              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,14 +36,36 @@ using std::cin;
 using std::cout;
 using std::cerr;
 
+void	computeEntry(const std::string& entry) {
+	try {
+		Parser				parser(entry);
+		Parser::result_tree	output = parser.parse();
+
+		Indeterminates		ind_res;
+
+		DEBUG("Collapsing");
+		ind_res = (*output)->collapse();
+		cout	<< "Expanded expression:\n" << ind_res << " = 0 " << NL;
+
+		Solver	solver(ind_res);
+		solver.solve();
+		DEBUG("Finished solving");
+	} catch (const Tokenizer::EmptyInput& empty) {
+		return;
+	} catch (const Indeterminates::ExpansionNotSupported& e) {
+		cerr << e.what() << NL;
+	} catch (const std::exception& e) {
+		cerr << "Error: " << e.what() << NL;
+	}
+}
+
+
 int main(int ac, char* const* av) {
 	if (ac == 2) {
 		// Input
-		cout << av[1] << NL;
-		///TODO
+		computeEntry(av[1]);
 		return 0;
 	} else if (ac != 1) {
-		// Prompt mode
 		puterror(__ARGUMENTS_COMPUTOR);
 		std::exit(EXIT_FAILURE);
 	} else if (!isatty(STDIN_FILENO)) {
@@ -60,27 +82,8 @@ int main(int ac, char* const* av) {
 		cout << PROMPT;
 		std::string			entry;
 		std::getline(cin, entry);
-		try {
-			Parser				parser(entry);
-			Parser::result_tree	output = parser.parse();
 
-			Indeterminates		ind_res;
-
-			DEBUG("Collapsing");
-			ind_res = (*output)->collapse();
-			cout	<< "Expanded expression:\n" << ind_res << " = 0 " << NL;
-
-			Solver	solver(ind_res);
-			solver.solve();
-			DEBUG("Finished solving");
-
-		} catch (const Tokenizer::EmptyInput& empty) {
-			continue;
-		} catch (const Indeterminates::ExpansionNotSupported& e) {
-			cerr << e.what() << NL;
-		} catch (const std::exception& e) {
-			cerr << "Error: " << e.what() << NL;
-		}
+		computeEntry(entry);
 	}
 	cout << "quit\n";
 	return 0;
