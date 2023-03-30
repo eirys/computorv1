@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   variable.hpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: etran <etran@student.42.fr>                +#+  +:+       +#+        */
+/*   By: eli <eli@student.42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/21 13:24:40 by eli               #+#    #+#             */
-/*   Updated: 2023/03/06 18:46:30 by etran            ###   ########.fr       */
+/*   Updated: 2023/03/30 16:44:56 by eli              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,25 +14,16 @@
 # define VARIABLE_HPP
 
 # include "atree_node.hpp"
+# include "rational.hpp"
 
-/**
- * Variable		: Rational
- * 				| Complex
- * 				| Matrix
-*/
 class Variable: virtual public ATreeNode {
 	public:
-		typedef 			ATreeNode					base;
-		typedef typename	base::unique_node			unique_node;
-		typedef typename	base::shared_node			shared_node;
-		typedef typename	base::weak_node				weak_node;
-
-		typedef typename	base::unique_itype			unique_itype;
-		typedef typename	base::shared_itype			shared_itype;
-		typedef typename	base::weak_itype			weak_itype;
+		typedef 			ATreeNode				base;
+		typedef typename	base::unique_node		unique_node;
+		typedef typename	base::shared_rational	shared_rational;
 
 		/* Constructor ------------------------------------------------------------ */
-		Variable(const shared_itype& val_ptr):
+		Variable(const shared_rational& val_ptr):
 			base(),
 			_val_ptr(val_ptr) {}
 
@@ -40,11 +31,12 @@ class Variable: virtual public ATreeNode {
 		virtual ~Variable() {}
 
 		/* ------------------------------------------------------------------------ */
-		const shared_itype	eval() {
+		const shared_rational	eval() const {
 			return _val_ptr;
 		}
 
 		void				print() {
+			LOG("[var]");
 			std::cout << *_val_ptr;
 		}
 
@@ -52,12 +44,16 @@ class Variable: virtual public ATreeNode {
 			return unique_node(new Variable(_val_ptr));
 		}
 
-		Indeterminates collapse() {
-			return Indeterminates(this);
+		unique_node			clone() const {
+			return unique_node(new Variable(_val_ptr));
+		}
+
+		Indeterminates		collapse() const {
+			return Indeterminates(_val_ptr);
 		}
 
 	private:
-		shared_itype	_val_ptr;
+		shared_rational	_val_ptr;
 };
 
 /* ========================================================================== */
@@ -65,19 +61,7 @@ class Variable: virtual public ATreeNode {
 /* ========================================================================== */
 
 inline Variable::unique_node	createVariable(const Rational& x) {
-	Variable::shared_itype	tmp(new Rational(x));
-
-	return Variable::unique_node(new Variable(tmp));
-}
-
-inline Variable::unique_node	createVariable(const Complex& x) {
-	Variable::shared_itype	tmp(new Complex(x));
-
-	return Variable::unique_node(new Variable(tmp));
-}
-
-inline Variable::unique_node	createVariable(const Matrix& x) {
-	Variable::shared_itype	tmp(new Matrix(x));
+	Variable::shared_rational	tmp = x.toShared();
 
 	return Variable::unique_node(new Variable(tmp));
 }

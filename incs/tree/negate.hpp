@@ -6,7 +6,7 @@
 /*   By: eli <eli@student.42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/21 15:10:38 by eli               #+#    #+#             */
-/*   Updated: 2023/02/12 10:55:59 by eli              ###   ########.fr       */
+/*   Updated: 2023/03/30 16:40:37 by eli              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,14 +17,9 @@
 
 class Negate: public virtual ATreeNode {
 	public:
-		typedef 			ATreeNode					base;
-		typedef typename	base::unique_node			unique_node;
-		typedef typename	base::shared_node			shared_node;
-		typedef typename	base::weak_node				weak_node;
-
-		typedef typename	base::unique_itype			unique_itype;
-		typedef typename	base::shared_itype			shared_itype;
-		typedef typename	base::weak_itype			weak_itype;
+		typedef 			ATreeNode				base;
+		typedef typename	base::unique_node		unique_node;
+		typedef typename	base::shared_rational	shared_rational;
 
 		/* Constructor ------------------------------------------------------------ */
 		Negate(unique_node&& right):
@@ -34,22 +29,13 @@ class Negate: public virtual ATreeNode {
 		virtual ~Negate() {}
 
 		/* ------------------------------------------------------------------------ */
-		const shared_itype	eval() {
-			const shared_itype&			tmp = base::getRight()->eval();
-
-			std::shared_ptr<Rational>	arg1 = std::dynamic_pointer_cast<Rational>(tmp);
-			if (arg1.get())
-				return shared_itype(new Rational(-*arg1));
-			std::shared_ptr<Complex>	arg2 = std::dynamic_pointer_cast<Complex>(tmp);
-			if (arg2.get())
-				return shared_itype(new Complex(-*arg2));
-			std::shared_ptr<Matrix>		arg3 = std::dynamic_pointer_cast<Matrix>(tmp);
-			if (arg3.get())
-				return shared_itype(new Matrix(-*arg3));
-			return nullptr;
+		const shared_rational	eval() const {
+			const Rational	result(- *base::getRight()->eval());
+			return result.toShared();
 		}
 
 		void				print() {
+			LOG("[neg]");
 			std::cout << "(-";
 			base::getRight()->print();
 			std::cout <<')';			
@@ -59,6 +45,21 @@ class Negate: public virtual ATreeNode {
 			return unique_node(
 				new Negate(std::move(base::getRight()))
 			);
+		}
+
+		unique_node			clone() const {
+			return unique_node(
+				new Negate(base::getRight()->clone())
+			);
+		}
+
+		Indeterminates		collapse() const {
+			Indeterminates	ind = -(base::getRight()->collapse());
+			DEBUG("Negate: " << ind);
+			#ifdef __DEBUG
+			ind.show();
+			#endif
+			return ind;
 		}
 };
 

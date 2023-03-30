@@ -1,22 +1,47 @@
-# ================ TARGETS =======================
+# **************************************************************************** #
+#                                                                              #
+#                                                         :::      ::::::::    #
+#    Makefile                                           :+:      :+:    :+:    #
+#                                                     +:+ +:+         +:+      #
+#    By: eli <eli@student.42.fr>                    +#+  +:+       +#+         #
+#                                                 +#+#+#+#+#+   +#+            #
+#    Created: 2023/01/06 12:28:09 by eli               #+#    #+#              #
+#    Updated: 2023/03/30 17:51:24 by eli              ###   ########.fr        #
+#                                                                              #
+# **************************************************************************** #
 
-NAME	= computor
+# ============================================================================ #
+#                                    TARGETS                                   #
+# ============================================================================ #
+
+NAME	= computorv1
 
 CC		= c++
-CFLAGS	= -Wall -Werror -Wextra -g -std=c++11
-INC		= -I./incs/parser -I./incs/tools -I./incs/tree -I./incs/types
+CFLAGS	= -Wall -Werror -Wextra -std=c++11 -g
+INC		= -I./incs/types -I./incs/tools -I./incs/tree -I./incs/parser
 
-SRCS	= main.cpp
+SRCS	= 	rational.cpp \
+			complex.cpp \
+			tokenizer.cpp \
+			parser.cpp \
+			indeterminates.cpp \
+			solver.cpp \
+			main.cpp
+
 OBJS	= $(SRCS:.cpp=.o)
-
-SRC		= $(addprefix src/, $(SRCS))
 OBJ		= $(addprefix obj/, $(OBJS))
 
 ifdef debug
-	CFLAGS += -DDEBUG=1
+	CFLAGS	+= -D__DEBUG=1
 endif
 
-# ================= RULES ========================
+ifdef verbose
+	CFLAGS	+= -D__VERBOSE=1
+endif
+
+# ============================================================================ #
+#                                     RULES                                    #
+# ============================================================================ #
 
 .PHONY: all
 all: obj $(NAME)
@@ -29,6 +54,15 @@ $(NAME): $(OBJ)
 
 obj/%.o: src/%.cpp
 	$(CC) $(CFLAGS) $(INC) -c $< -o $@
+
+.PHONY: debug
+debug: fclean
+	make debug=1
+
+.PHONY: verbose
+verbose: fclean
+	make verbose=1
+	
 
 .PHONY: clean
 clean:

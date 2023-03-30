@@ -6,7 +6,7 @@
 /*   By: eli <eli@student.42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/22 18:26:40 by eli               #+#    #+#             */
-/*   Updated: 2023/02/10 11:53:57 by eli              ###   ########.fr       */
+/*   Updated: 2023/03/18 20:29:07 by eli              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,16 +18,26 @@
 # include <iomanip>
 # include <sstream>
 # include <string>
+# include <memory>
+# include <algorithm>
+
+# include "parser_macro.hpp"
 
 # define NL std::endl
 # define FLOAT_PRECISION 3
+# define PROMPT ">_ "
 
-#if DEBUG == 1
+#ifdef __VERBOSE
 # define LOG(X) std::cerr << X << NL
 #else
 # define LOG(X)
 #endif
 
+#ifdef __DEBUG
+# define DEBUG(X) std::cerr << X << NL
+#else
+# define DEBUG(X)
+#endif
 
 namespace utils {
 
@@ -35,24 +45,37 @@ namespace utils {
 /*                                  PROTOTYPE                                 */
 /* ========================================================================== */
 
-template <typename T>
-	void display(const std::list<T>& l);
+bool		isCharset(const char c, const std::string charset);
+std::string	toLower(const std::string& s);
+std::string	trimmed(const std::string& s);
 
 /* ========================================================================== */
 /*                                 DEFINITION                                 */
 /* ========================================================================== */
 
-template <typename T>
-	inline void display(const std::list<T>& l) {
-		for (typename std::list<T>::const_iterator it = l.begin(); it != l.end(); ++it)
-			std::cout << '[' << *it << "] ";
-		std::cout << std::endl;
-	}
-
-inline bool	isCharset(const char c, const std::string charset) {
+inline	bool	isCharset(const char c, const std::string charset) {
 	if (charset.find(c) != std::string::npos)
 		return true;
 	return false;
+}
+
+inline std::string	toLower(const std::string& s) {
+	std::string	copy(s);
+	std::transform(
+		copy.begin(),
+		copy.end(),
+		copy.begin(),
+		[](unsigned char c) { return std::tolower(c); }
+	);
+	return copy;
+}
+
+inline std::string	trimmed(const std::string& s) {
+	size_t	new_start = s.find_first_not_of(WHITESPACES);
+	if (new_start == std::string::npos)
+		return std::string();
+	size_t	new_end = s.find_last_not_of(WHITESPACES);
+	return s.substr(new_start, new_end + 1 - new_start);
 }
 
 } // namespace utils

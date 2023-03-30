@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   power.hpp                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: etran <etran@student.42.fr>                +#+  +:+       +#+        */
+/*   By: eli <eli@student.42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/04 17:08:46 by etran             #+#    #+#             */
-/*   Updated: 2023/03/04 17:42:17 by etran            ###   ########.fr       */
+/*   Updated: 2023/03/30 17:51:05 by eli              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,14 +17,9 @@
 
 class Power: public virtual ATreeNode {
 	public:
-		typedef 			ATreeNode					base;
-		typedef typename	base::unique_node			unique_node;
-		typedef typename	base::shared_node			shared_node;
-		typedef typename	base::weak_node				weak_node;
-
-		typedef typename	base::unique_itype			unique_itype;
-		typedef typename	base::shared_itype			shared_itype;
-		typedef typename	base::weak_itype			weak_itype;
+		typedef 			ATreeNode				base;
+		typedef typename	base::unique_node		unique_node;
+		typedef typename	base::shared_rational	shared_rational;
 
 		/* Constructor ------------------------------------------------------------ */
 		Power(unique_node&& left, unique_node&& right):
@@ -34,22 +29,13 @@ class Power: public virtual ATreeNode {
 		virtual ~Power() {}
 
 		/* ------------------------------------------------------------------------ */
-		const shared_itype	eval() {
-			const shared_itype&			tmp = base::getLeft()->eval();
-
-			std::shared_ptr<Rational>	arg1 = std::dynamic_pointer_cast<Rational>(tmp);
-			if (arg1.get())
-				return *arg1 ^ base::getRight()->eval();
-			std::shared_ptr<Complex>	arg2 = std::dynamic_pointer_cast<Complex>(tmp);
-			if (arg2.get())
-				return *arg2 ^ base::getRight()->eval();
-			std::shared_ptr<Matrix>		arg3 = std::dynamic_pointer_cast<Matrix>(tmp);
-			if (arg3.get())
-				return *arg3 ^ base::getRight()->eval();
-			return nullptr;
+		const shared_rational	eval() const {
+			const Rational	result = *base::getLeft()->eval() ^ *base::getRight()->eval();
+			return result.toShared();
 		}
 
 		void				print() {
+			LOG("[pow]");
 			base::getLeft()->print();
 			std::cout << '^';
 			base::getRight()->print();
@@ -59,6 +45,21 @@ class Power: public virtual ATreeNode {
 			return unique_node(
 				new Power(std::move(base::getLeft()), std::move(base::getRight()))
 			);
+		}
+
+		unique_node			clone() const {
+			return unique_node(
+				new Power(base::getLeft()->clone(), base::getRight()->clone())
+			);
+		}
+
+		Indeterminates		collapse() const {
+			Indeterminates	ind = base::getLeft()->collapse() ^ base::getRight()->collapse();
+			DEBUG("Power: " << ind);
+			#ifdef __DEBUG
+			ind.show();
+			#endif
+			return ind;
 		}
 };
 

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   rational.hpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: etran <etran@student.42.fr>                +#+  +:+       +#+        */
+/*   By: eli <eli@student.42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/06 13:34:17 by eli               #+#    #+#             */
-/*   Updated: 2023/03/07 17:04:50 by etran            ###   ########.fr       */
+/*   Updated: 2023/03/30 17:32:42 by eli              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,25 +14,13 @@
 # define RATIONAL_HPP
 
 # include <string>
+# include <memory>
 
 # include "utils.hpp"
-# include "itype.hpp"
 
-class Complex;
-class Matrix;
-
-/**
- * Rational		: { - } digit { digit | { . digit } }
- * 
- * example:		-123
- * 				0.56
- *
-*/
-class Rational: public IType {
+class Rational {
 	public:
-		typedef typename	IType::unique_itype		unique_itype;
-		typedef typename	IType::shared_itype		shared_itype;
-		typedef typename	IType::weak_itype		weak_itype;
+		typedef typename	std::shared_ptr<Rational>		shared_rational;
 
 		Rational();
 		virtual ~Rational();
@@ -68,31 +56,25 @@ class Rational: public IType {
 		Rational&		operator%=(const Rational& rhs);
 		Rational		operator%(const Rational& rhs) const;
 
-		/* Complex Operators ------------------------------------------------------ */
-		Complex			operator+(const Complex& rhs) const;
-		Complex			operator-(const Complex& rhs) const;
-		Complex			operator*(const Complex& rhs) const;
-		Complex			operator/(const Complex& rhs) const;
-		Complex			operator^(const Complex& rhs) const;
-		Complex			operator%(const Complex& rhs) const;
-
 		/* Getter ----------------------------------------------------------------- */
 		long double		getVal() const;
 
 		/* Tools ------------------------------------------------------------------ */
 		bool			operator!() const;
 		bool			isInteger() const;
+		shared_rational	toShared() const;
+
+		/* Relational Operators --------------------------------------------------- */
+		bool			operator==(const Rational& y) const;
+		bool			operator<(const Rational& y) const;
+		bool			operator!=(const Rational& y) const;
+		bool			operator<=(const Rational& y) const;
+		bool			operator>(const Rational& y) const;
+		bool			operator>=(const Rational& y) const;
 
 	private:
 		long double		_val;
 };
-
-bool			operator==(const Rational& x, const Rational& y);
-bool			operator<(const Rational& x, const Rational& y);
-bool			operator!=(const Rational& x, const Rational& y);
-bool			operator<=(const Rational& x, const Rational& y);
-bool			operator>(const Rational& x, const Rational& y);
-bool			operator>=(const Rational& x, const Rational& y);
 
 std::ostream&	operator<<(std::ostream& o, const Rational& x);
 

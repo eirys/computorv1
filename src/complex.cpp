@@ -3,15 +3,14 @@
 /*                                                        :::      ::::::::   */
 /*   complex.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: etran <etran@student.42.fr>                +#+  +:+       +#+        */
+/*   By: eli <eli@student.42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/06 21:07:29 by eli               #+#    #+#             */
-/*   Updated: 2023/03/07 17:12:42 by etran            ###   ########.fr       */
+/*   Updated: 2023/03/30 17:33:06 by eli              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "complex.hpp"
-#include "matrix.hpp"
 #include "math.hpp"
 
 /* ========================================================================== */
@@ -24,39 +23,21 @@ Complex::Complex():
 
 Complex::~Complex() {}
 
-Complex::Complex(const Complex& x):
-	_re(x.getReal()),
-	_im(x.getImaginary()) {}
-
 Complex::Complex(const Rational& x, const Rational& y):
 	_re(x),
 	_im(y) {}
 
-/* -------------------------------------------------------------------------- */
-
-Complex& Complex::operator=(const Complex& rhs) {
-	if (this == &rhs)
-		return *this;
-	_re = rhs.getReal();
-	_im = rhs.getImaginary();
-	return *this;
-}
-
 /* Getters ------------------------------------------------------------------ */
 
-Rational Complex::getReal() const {
-	return Rational(_re);
+const Rational& Complex::getReal() const {
+	return _re;
 }
 
-Rational Complex::getImaginary() const {
-	return Rational(_im);
+const Rational& Complex::getImaginary() const {
+	return _im;
 }
 
 /* Tools -------------------------------------------------------------------- */
-
-bool	Complex::operator!() const {
-	return !getReal() && !getImaginary();
-}
 
 bool	Complex::isComplex() const {
 	return getImaginary().getVal() && getReal().getVal();
@@ -71,18 +52,8 @@ bool	Complex::isImaginary() const {
 }
 
 /* ========================================================================== */
-/*                                   PRIVATE                                  */
+/*                                    OTHER                                   */
 /* ========================================================================== */
-
-/* Relational operators ----------------------------------------------------- */
-
-bool operator==(const Complex& x, const Complex& y) {
-	return x.getReal() == y.getReal() && x.getImaginary() == y.getImaginary();
-}
-
-bool operator!=(const Complex& x, const Complex& y) {
-	return !operator==(x,y);
-}
 
 /* I/O stream operator ------------------------------------------------------ */
 
