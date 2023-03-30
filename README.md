@@ -6,4 +6,6 @@ My 42 project computerv1 (C++)
 `make`
 
 ### usage
-`./computor "1 * X ^ 0 + 2 * X ^ 1 + 3 * X ^ 2 = 4 * X ^ 1"`
+`./computorv1 "x+1 +x^2 = -1 -3x + 2x^2"`
+or
+`./computorv1`
